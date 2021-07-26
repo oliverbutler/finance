@@ -1,26 +1,3 @@
-import { Document, Model, PopulatedDoc } from "mongoose";
-
-export interface Database {
-  models: {
-    bank: Model<BankModel, {}, {}>;
-    account: Model<AccountModel, {}, {}>;
-    trueLayer: Model<TrueLayerModel, {}, {}>;
-  };
-}
-
-export interface MongooseDefaults {
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface TrueLayerAttributes extends MongooseDefaults {
-  refreshToken: string;
-  accessToken: string;
-  scope: string[];
-  expiresAt: Date;
-  lastAccessAt: Date;
-}
-
 export interface TrueLayer {
   id: string;
   refreshToken: string;
@@ -28,12 +5,6 @@ export interface TrueLayer {
   scope: string[];
   expiresAt: string;
   lastAccessAt: string;
-}
-
-export interface BankAttributes extends MongooseDefaults {
-  name: string;
-  trueLayer?: TrueLayerModel;
-  accounts?: PopulatedDoc<AccountModel>[];
 }
 
 export interface Bank {
@@ -45,13 +16,6 @@ export interface Bank {
   updatedAt: string;
 }
 
-export interface BalanceAttributes extends MongooseDefaults {
-  currency: string;
-  available: number;
-  current: number;
-  overdraft: number;
-}
-
 export interface Balance {
   id: string;
   currency: string;
@@ -60,34 +24,12 @@ export interface Balance {
   overdraft: number;
 }
 
-export interface TransactionAttributes extends MongooseDefaults {
-  currency: string;
-  amount: number;
-  description: string;
-  timestamp: Date;
-}
-
 export interface Transaction {
   id: string;
   currency: string;
   amount: number;
   description: string;
   timestamp: string;
-}
-
-export interface AccountAttributes extends MongooseDefaults {
-  name: string;
-  bankLogo: string;
-
-  trueLayerType: string;
-  trueLayerId: string;
-
-  accountNumber: string;
-  sortCode: string;
-  currency: string;
-  balance: BalanceModel;
-
-  transactions: TransactionModel[];
 }
 
 export interface Account {
@@ -102,16 +44,6 @@ export interface Account {
   balance: Balance;
   transactions: Transaction[];
 }
-
-export type TrueLayerModel = TrueLayerAttributes &
-  Document<any, any, TrueLayerAttributes>;
-export type BankModel = BankAttributes & Document<any, any, BankAttributes>;
-export type AccountModel = AccountAttributes &
-  Document<any, any, AccountAttributes>;
-export type BalanceModel = BalanceAttributes &
-  Document<any, any, BalanceAttributes>;
-export type TransactionModel = TransactionAttributes &
-  Document<any, any, TransactionAttributes>;
 
 export interface ExchangeCodeResponse {
   access_token: string;
