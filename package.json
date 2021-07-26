@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "mongodb": "^3.5.9",
+    "axios": "^0.21.1",
+    "mongodb": "^4.0.1",
+    "mongoose": "^5.13.3",
     "next": "11.0.1",
     "next-auth": "^3.27.3",
     "react": "17.0.2",

@@ -1,12 +1,19 @@
-export interface UserModel {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  banks?: BankModel[];
+import { Document, Model, PopulatedDoc } from "mongoose";
+
+export interface Database {
+  models: {
+    bank: Model<BankModel, {}, {}>;
+    account: Model<AccountModel, {}, {}>;
+    trueLayer: Model<TrueLayerModel, {}, {}>;
+  };
 }
 
-export interface TrueLayerModel {
+export interface MongooseDefaults {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TrueLayerAttributes extends MongooseDefaults {
   refreshToken: string;
   accessToken: string;
   scope: string[];
@@ -14,27 +21,61 @@ export interface TrueLayerModel {
   lastAccessAt: Date;
 }
 
-export interface BankModel {
-  name: string;
-  trueLayer: TrueLayerModel;
-  accounts?: AccountModel[];
+export interface TrueLayer {
+  id: string;
+  refreshToken: string;
+  accessToken: string;
+  scope: string[];
+  expiresAt: string;
+  lastAccessAt: string;
 }
 
-export interface BalanceModel {
+export interface BankAttributes extends MongooseDefaults {
+  name: string;
+  trueLayer?: TrueLayerModel;
+  accounts?: PopulatedDoc<AccountModel>[];
+}
+
+export interface Bank {
+  id: string;
+  name: string;
+  trueLayer: TrueLayer | null;
+  accounts: Account[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BalanceAttributes extends MongooseDefaults {
   currency: string;
   available: number;
   current: number;
   overdraft: number;
 }
 
-export interface TransactionModel {
+export interface Balance {
+  id: string;
+  currency: string;
+  available: number;
+  current: number;
+  overdraft: number;
+}
+
+export interface TransactionAttributes extends MongooseDefaults {
   currency: string;
   amount: number;
   description: string;
   timestamp: Date;
 }
 
-export interface AccountModel {
+export interface Transaction {
+  id: string;
+  currency: string;
+  amount: number;
+  description: string;
+  timestamp: string;
+}
+
+export interface AccountAttributes extends MongooseDefaults {
   name: string;
   bankLogo: string;
 
@@ -48,6 +89,29 @@ export interface AccountModel {
 
   transactions: TransactionModel[];
 }
+
+export interface Account {
+  id: string;
+  name: string;
+  bankLogo: string;
+  trueLayerType: string;
+  trueLayerId: string;
+  accountNumber: string;
+  sortCode: string;
+  currency: string;
+  balance: Balance;
+  transactions: Transaction[];
+}
+
+export type TrueLayerModel = TrueLayerAttributes &
+  Document<any, any, TrueLayerAttributes>;
+export type BankModel = BankAttributes & Document<any, any, BankAttributes>;
+export type AccountModel = AccountAttributes &
+  Document<any, any, AccountAttributes>;
+export type BalanceModel = BalanceAttributes &
+  Document<any, any, BalanceAttributes>;
+export type TransactionModel = TransactionAttributes &
+  Document<any, any, TransactionAttributes>;
 
 export interface ExchangeCodeResponse {
   access_token: string;
