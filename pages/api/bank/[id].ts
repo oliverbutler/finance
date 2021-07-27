@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { connectMongo } from "lib/db/mongodb";
-import { deleteBank, getBank, getBanks, updateBank } from "lib/db/banks";
+import { deleteBank, getBank, getBanks, updateBank } from "lib/db/bank";
 
 export default async function handler(
   req: NextApiRequest,
