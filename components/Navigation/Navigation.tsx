@@ -2,6 +2,7 @@ import { signIn, signOut, useSession } from "next-auth/client";
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
+import { Button, Button_Type } from "components/Button/Button";
 
 const PAGES = [
   {
@@ -24,11 +25,13 @@ const Navigation = () => {
         ))}
       </div>
       <div className="flex flex-row">
-        {session ? (
-          <button onClick={() => signOut()}>Sign Out</button>
-        ) : (
-          <button onClick={() => signIn()}>Sign In</button>
-        )}
+        <Button
+          className="-m-2 delay-500"
+          variant={session ? Button_Type.Secondary : Button_Type.Primary}
+          onClick={session ? () => signOut() : () => signIn()}
+        >
+          Sign {session ? "out" : "in"}
+        </Button>
       </div>
     </nav>
   );

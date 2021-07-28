@@ -1,9 +1,13 @@
 import "../styles/index.css";
 
 import type { AppProps } from "next/app";
+import { useSession } from "next-auth/client";
+
 import { QueryClient, QueryClientProvider } from "react-query";
 import Head from "next/head";
 import Navigation from "../components/Navigation/Navigation";
+import { useRouter } from "next/dist/client/router";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 

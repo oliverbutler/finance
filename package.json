@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.3",
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
     "mongodb": "^3.5.9",

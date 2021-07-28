@@ -10,7 +10,7 @@ export default function Home() {
   const [session, loading] = useSession();
 
   const { isLoading, error, data } = useQuery("banks", () =>
-    fetch("http://localhost:3000/api/banks").then((res) => res.json())
+    fetch("http://localhost:4000/api/banks").then((res) => res.json())
   );
 
   return (

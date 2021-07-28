@@ -1,3 +1,4 @@
+import { Loading } from "components/Loading/Loading";
 import Page from "components/Page/Page";
 import { Title } from "components/Typography/Typography";
 import { useRouter } from "next/dist/client/router";
@@ -12,6 +13,7 @@ const Callback: React.FunctionComponent<Props> = (props) => {
   return (
     <Page>
       <Title>Successfully Connected To TrueLayer 🎉</Title>
+      <Loading />
     </Page>
   );
 };

@@ -18,6 +18,7 @@ interface Props
   > {
   variant?: Button_Type;
   link?: LinkProps;
+  icon?: React.ReactNode;
 }
 
 const getColor = (type: Button_Type) => {
@@ -47,19 +48,23 @@ const LinkWrapper = (props: Partial<Props>) => {
 
 export const Button: React.FunctionComponent<Props> = ({
   variant = Button_Type.Info,
+  className,
   children,
   link,
+  icon,
   ...props
 }) => {
   return (
     <LinkWrapper link={link}>
       <button
         className={classNames(
-          "text-white font-bold py-2 px-4 rounded",
-          getColor(variant)
+          "text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-default flex fill-current items-center",
+          getColor(variant),
+          className
         )}
         {...props}
       >
+        {icon && <div className="mr-2">{icon}</div>}
         {children}
       </button>
     </LinkWrapper>
