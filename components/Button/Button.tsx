@@ -24,9 +24,9 @@ interface Props
 const getColor = (type: Button_Type) => {
   switch (type) {
     case Button_Type.Primary:
-      return "bg-indigo-500 hover:bg-indigo-700";
+      return "bg-white text-indigo-600 hover:bg-gray-100";
     case Button_Type.Secondary:
-      return "bg-pink-500 hover:bg-pink-700";
+      return "bg-indigo-500  hover:bg-indigo-700";
     case Button_Type.Info:
       return "bg-blue-500 hover:bg-blue-700";
     case Button_Type.Success:
@@ -47,7 +47,7 @@ const LinkWrapper = (props: Partial<Props>) => {
 };
 
 export const Button: React.FunctionComponent<Props> = ({
-  variant = Button_Type.Info,
+  variant = Button_Type.Primary,
   className,
   children,
   link,
@@ -58,13 +58,17 @@ export const Button: React.FunctionComponent<Props> = ({
     <LinkWrapper link={link}>
       <button
         className={classNames(
-          "text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-default flex fill-current items-center transition ",
+          "text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-default flex fill-current items-center transition border border-transparent shadow whitespace-nowrap",
           getColor(variant),
           className
         )}
         {...props}
       >
-        {icon && <div className="mr-2">{icon}</div>}
+        {icon && (
+          <div className={classNames("h-6 w-6", { children: "mr-2" })}>
+            {icon}
+          </div>
+        )}
         {children}
       </button>
     </LinkWrapper>

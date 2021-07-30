@@ -1,6 +1,6 @@
 import { signIn, signOut, useSession } from "next-auth/client";
 import Link from "next/link";
-import Image from "next/image";
+import { EyeOffIcon } from "@heroicons/react/outline";
 import React from "react";
 import { Button, Button_Type } from "components/Button/Button";
 
@@ -17,15 +17,20 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-0 w-full flex justify-between p-4 bg-gray-800 text-white">
+      <nav className="fixed top-0 w-full flex justify-between p-4 bg-indigo-700 text-white z-50">
         <div>
           {PAGES.map((page) => (
             <Link href={page.path} key={page.path}>
-              <a className="border-b-2">{page.title}</a>
+              <a className="font-bold text-md">{page.title}</a>
             </Link>
           ))}
         </div>
         <div className="flex flex-row">
+          <Button
+            className="-m-2 mr-4"
+            variant={Button_Type.Primary}
+            icon={<EyeOffIcon />}
+          />
           <Button
             className="-m-2"
             variant={session ? Button_Type.Secondary : Button_Type.Primary}
