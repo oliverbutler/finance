@@ -14,7 +14,7 @@
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
     "moment": "^2.29.1",
-    "mongodb": "^4.0.1",
+    "mongodb": "3.6.10",
     "next": "11.0.1",
     "next-auth": "^3.27.3",
     "react": "17.0.2",
@@ -22,6 +22,7 @@
     "react-query": "^3.19.0"
   },
   "devDependencies": {
+    "@types/mongodb": "^4.0.7",
     "@types/react": "17.0.15",
     "autoprefixer": "^10.3.1",
     "eslint": "7.31.0",

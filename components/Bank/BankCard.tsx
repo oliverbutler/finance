@@ -21,7 +21,7 @@ interface Props {
 }
 export const BankCard: React.FunctionComponent<Props> = ({ bank }) => {
   return (
-    <div className="bg-pink-100 p-2 rounded-md mt-4">
+    <div className=" p-2 rounded-md mt-4">
       <div className="flex flex-row">
         <Button
           className="mr-4"
