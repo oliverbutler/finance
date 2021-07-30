@@ -1,3 +1,4 @@
+import { Sensitive } from "components/Sensitive/Sensitive";
 import moment from "moment";
 import Image from "next/image";
 import React from "react";
@@ -27,14 +28,18 @@ export const Accounts: React.FunctionComponent<Props> = ({ accounts }) => {
               <p className="font-light text-indigo-100 text-sm">
                 Balance {moment(account.balance?.updatedAt).fromNow()}
               </p>
-              <p className="font-bold text-2xl">£{account.balance?.current}</p>
+              <p className="font-bold text-2xl">
+                £<Sensitive>{account.balance?.current}</Sensitive>
+              </p>
             </div>
             <div>
               <p className="font-light text-indigo-100 text-sm mt-6">
                 Account Number
               </p>
               <p className="font-bold font-mono">
-                <span className="mr-3">{account.accountNumber.number}</span>
+                <span className="mr-3">
+                  <Sensitive>{account.accountNumber.number}</Sensitive>
+                </span>
                 {account.accountNumber.sortCode}
               </p>
             </div>

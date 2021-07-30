@@ -16,3 +16,14 @@ export const mapBanksToAccounts = (banks: Bank[]): Account[] => {
   banks.forEach((bank) => accounts.push(...bank.accounts));
   return accounts;
 };
+
+export const sumAccountsBalances = (
+  accounts: Account[] | undefined
+): number => {
+  if (accounts === undefined) return 0;
+  let balance = 0;
+  accounts.forEach(
+    (account) => (balance += account.balance ? account.balance.current : 0)
+  );
+  return balance;
+};

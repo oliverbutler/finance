@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EyeOffIcon } from "@heroicons/react/outline";
 import React from "react";
 import { Button, Button_Type } from "components/Button/Button";
+import { useSensitive } from "components/ContextWrapper/ContextWrapper";
 
 const PAGES = [
   {
@@ -14,6 +15,8 @@ const PAGES = [
 
 const Navigation = () => {
   const [session, loading] = useSession();
+
+  const { sensitive, setSensitive } = useSensitive();
 
   return (
     <>
@@ -30,6 +33,7 @@ const Navigation = () => {
             className="-m-2 mr-4"
             variant={Button_Type.Primary}
             icon={<EyeOffIcon />}
+            onClick={() => setSensitive(!sensitive)}
           />
           <Button
             className="-m-2"

@@ -1,15 +1,11 @@
 import React from "react";
 import Page from "../components/Page/Page";
-import { useSession } from "next-auth/client";
 import { useQuery } from "react-query";
-import { Button, Button_Type } from "components/Button/Button";
-import { Title } from "components/Typography/Typography";
-import { ConnectBankButton } from "components/ConnectBank/ConnectBankButton";
-import { Account, Bank } from "types/global";
-import { BankCard } from "components/Bank/BankCard";
+import { Bank } from "types/global";
 import { Loading } from "components/Loading/Loading";
-import { mapBanksToAccounts } from "lib/utils";
+import { mapBanksToAccounts, sumAccountsBalances } from "lib/utils";
 import { Accounts } from "components/Account/Accounts";
+import { Sensitive } from "components/Sensitive/Sensitive";
 
 export default function Home() {
   const { isLoading, error, data } = useQuery<Bank[]>("banks", () =>
@@ -18,9 +14,7 @@ export default function Home() {
 
   const accounts = data && mapBanksToAccounts(data);
 
-  const currentBalance = Number(
-    accounts?.reduce((a, b) => a.balance?.current + b.balance?.current)
-  ).toFixed(2);
+  const currentBalance = sumAccountsBalances(accounts).toFixed(2);
 
   return (
     <Page>
@@ -28,7 +22,7 @@ export default function Home() {
         <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
           <span className="block">Welcome to your Dashboard</span>
           <span className="block text-indigo-600">
-            You&lsquo;ve currently got £{currentBalance}
+            You&lsquo;ve currently got £<Sensitive>{currentBalance}</Sensitive>
           </span>
         </h2>
       </div>
