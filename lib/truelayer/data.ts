@@ -2,8 +2,10 @@ import axios from "axios";
 import { getBank, refreshBankIfNeeded } from "lib/db/bank";
 import {
   AccountResponse,
+  Balance,
   ExchangeCodeResponse,
   RefreshTokenResponse,
+  Transaction,
 } from "types/global";
 
 const TRUE_LAYER_CLIENT_ID = process.env.TRUE_LAYER_CLIENT_ID;
@@ -86,41 +88,45 @@ export const getTruelayerAccounts = async (
     .catch(() => new Error("Error fetching TrueLayer accounts"));
 };
 
-// /**
-//  * @param {number} bankId
-//  *
-//  * Populates the bank entry with TrueLayer accounts.
-//  **/
-// const populateTrueLayerAccounts = async (
-//   bankId: number
-// ): Promise<BankModel | Error> => {
-//   const accountsResponse = await getTruelayerAccounts(bankId);
+export const getAllAccountTransactions = async (
+  bankId: string,
+  accountId: string
+): Promise<Transaction[]> => {
+  return [];
+};
 
-//   if (accountsResponse instanceof Error) {
-//     return accountsResponse;
-//   }
+export const getAccountBalance = async (
+  bankId: string,
+  accountId: string
+): Promise<Balance | Error> => {
+  const bank = await getBank(bankId);
+  if (bank === undefined) return new Error("Bank doesn't exist");
 
-//   const bank = await Bank.findByPk(bankId);
+  // If we're expired, kick off a refresh
+  await refreshBankIfNeeded(bankId);
 
-//   // Map each TrueLayer account to an AccountModel
-//   accountsResponse.forEach((account) => {
-//     const newAccount = Account.create({
-//       accountId: account.account_id,
-//       accountType: account.account_type,
-//       bankName: account.provider.display_name,
-//       displayName: account.display_name,
-//       currency: account.currency,
-//       accountNumber: account.account_number.number,
-//       sortCode: account.account_number.sort_code,
-//       swiftBic: account.account_number.swift_bic,
-//       iban: account.account_number.iban,
-//       providerId: account.provider.provider_id,
-//       bankLogo: account.provider.logo_url,
-//     });
-
-//     // TODO set AccountModel PK to accountId so we can just update it whenever, without risk
-//     // TODO then update bank to have the latest info
-//   });
-
-//   return bank;
-// };
+  return axios
+    .get(
+      `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/balance`,
+      {
+        headers: {
+          Authorization: `Bearer ${bank.trueLayer?.accessToken}`,
+        },
+      }
+    )
+    .then((res) => {
+      const data = res.data.results[0];
+      const balance: Balance = {
+        currency: data.currency,
+        available: data.available,
+        current: data.current,
+        overdraft: data.overdraft,
+        trueLayerUpdatedAt: new Date(data.update_timestamp),
+        updatedAt: new Date(),
+      };
+      return balance;
+    })
+    .catch((err) => {
+      return new Error("TL request for balance failed");
+    });
+};

@@ -16,11 +16,12 @@ export interface Bank {
 }
 
 export interface Balance {
-  id: string;
   currency: string;
   available: number;
   current: number;
   overdraft: number;
+  trueLayerUpdatedAt: Date;
+  updatedAt: Date;
 }
 
 export interface Transaction {

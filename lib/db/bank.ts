@@ -1,4 +1,5 @@
 import {
+  getAccountBalance,
   getTruelayerAccounts,
   refreshTokenTrueLayer,
 } from "lib/truelayer/data";
@@ -99,4 +100,32 @@ export const refreshBankIfNeeded = async (id: string): Promise<boolean> => {
   });
 
   return true;
+};
+
+export const updateBankBalances = async (
+  bankId: string
+): Promise<string | Error> => {
+  const { db } = await connectMongo();
+
+  const bank = await getBank(bankId);
+
+  if (bank === undefined) return new Error("Bank not found");
+
+  bank.accounts.forEach(async (account, index) => {
+    const balance = await getAccountBalance(bankId, account.trueLayerId);
+
+    if (balance instanceof Error)
+      return new Error("Can't get balance for account");
+
+    await db.collection("banks").updateOne(
+      { _id: new ObjectId(bankId) },
+      {
+        $set: {
+          [`accounts.${index}.balance`]: balance,
+        },
+      }
+    );
+  });
+
+  return "Success";
 };

@@ -1,5 +1,6 @@
+import { updateBankBalances } from "lib/db/bank";
+import { getAccountBalance } from "lib/truelayer/data";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { initializeBankAccounts } from "lib/db/bank";
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,13 +9,10 @@ export default async function handler(
   switch (req.method) {
     case "PUT":
       if (req.body.bankId === undefined)
-        return res.status(400).json({ error: "Missing bankId" });
+        return res.status(405).send("bankId required");
 
-      const accountInitializeResult = await initializeBankAccounts(
-        req.body.bankId
-      );
-
-      return res.json(accountInitializeResult);
+      const result = await updateBankBalances(req.body.bankId);
+      return res.send(result);
     default:
       return res.status(405).json({
         message: "Method not allowed",
