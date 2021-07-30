@@ -16,7 +16,7 @@ export const ConnectBankButton: React.FunctionComponent<Props> = (props) => {
       disabled={!portalData}
       link={portalData && { href: portalData.uri }}
     >
-      Connect to TrueLayer
+      Connect New Bank
     </Button>
   );
 };

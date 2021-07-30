@@ -16,24 +16,27 @@ const Navigation = () => {
   const [session, loading] = useSession();
 
   return (
-    <nav className="flex justify-between p-4 bg-gray-800 text-white">
-      <div>
-        {PAGES.map((page) => (
-          <Link href={page.path} key={page.path}>
-            <a className="border-b-2">{page.title}</a>
-          </Link>
-        ))}
-      </div>
-      <div className="flex flex-row">
-        <Button
-          className="-m-2 delay-500"
-          variant={session ? Button_Type.Secondary : Button_Type.Primary}
-          onClick={session ? () => signOut() : () => signIn()}
-        >
-          Sign {session ? "out" : "in"}
-        </Button>
-      </div>
-    </nav>
+    <>
+      <nav className="fixed top-0 w-full flex justify-between p-4 bg-gray-800 text-white">
+        <div>
+          {PAGES.map((page) => (
+            <Link href={page.path} key={page.path}>
+              <a className="border-b-2">{page.title}</a>
+            </Link>
+          ))}
+        </div>
+        <div className="flex flex-row">
+          <Button
+            className="-m-2"
+            variant={session ? Button_Type.Secondary : Button_Type.Primary}
+            onClick={session ? () => signOut() : () => signIn()}
+          >
+            Sign {session ? "out" : "in"}
+          </Button>
+        </div>
+      </nav>
+      <div className="mt-10" />
+    </>
   );
 };
 

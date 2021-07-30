@@ -58,7 +58,7 @@ export const Button: React.FunctionComponent<Props> = ({
     <LinkWrapper link={link}>
       <button
         className={classNames(
-          "text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-default flex fill-current items-center",
+          "text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-default flex fill-current items-center transition ",
           getColor(variant),
           className
         )}

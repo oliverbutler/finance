@@ -1,19 +1,18 @@
 export interface TrueLayer {
-  id: string;
   refreshToken: string;
   accessToken: string;
   scope: string[];
-  expiresAt: string;
-  lastAccessAt: string;
+  expiresAt: Date;
+  lastAccessAt: Date;
 }
 
 export interface Bank {
-  id: string;
+  _id: string;
   name: string;
   trueLayer: TrueLayer | null;
   accounts: Account[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Balance {
@@ -33,15 +32,24 @@ export interface Transaction {
 }
 
 export interface Account {
-  id: string;
-  name: string;
-  bankLogo: string;
-  trueLayerType: string;
   trueLayerId: string;
-  accountNumber: string;
-  sortCode: string;
+  trueLayerType: string;
+  name: string;
   currency: string;
-  balance: Balance;
+  accountNumber: {
+    iban: string;
+    swiftBic: string;
+    number: string;
+    sortCode: string;
+  };
+  provider: {
+    displayName: string;
+    providerId: string;
+    logoUri: string;
+  };
+  trueLayerUpdatedAt: Date;
+
+  balance?: Balance;
   transactions: Transaction[];
 }
 
@@ -75,6 +83,7 @@ export interface AccountResponse {
   provider: {
     display_name: string;
     provider_id: string;
-    logo_url: string;
+    logo_uri: string;
   };
+  update_timestamp: string;
 }

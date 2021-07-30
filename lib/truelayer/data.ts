@@ -1,75 +1,90 @@
-// import axios from "axios";
-// import { AccountResponse, BankModel, ExchangeCodeResponse, RefreshTokenResponse } from "types/global";
+import axios from "axios";
+import { getBank, refreshBankIfNeeded } from "lib/db/bank";
+import {
+  AccountResponse,
+  ExchangeCodeResponse,
+  RefreshTokenResponse,
+} from "types/global";
 
-// export const exchangeCode = async (
-//   code: string
-// ): Promise<ExchangeCodeResponse | Error> => {
-//   const params = new URLSearchParams();
-//   params.set("grant_type", "authorization_code");
-//   params.set("client_id", process.env.TRUE_LAYER_CLIENT_ID);
-//   params.set("client_secret", process.env.TRUE_LAYER_CLIENT_SECRET);
-//   params.set("redirect_uri", "http://localhost:3000/callback");
-//   params.set("code", code);
+const TRUE_LAYER_CLIENT_ID = process.env.TRUE_LAYER_CLIENT_ID;
+const TRUE_LAYER_CLIENT_SECRET = process.env.TRUE_LAYER_CLIENT_SECRET;
 
-//   return axios
-//     .post(`https://${process.env.TRUE_LAYER_AUTH_API}/connect/token`, params, {
-//       headers: {
-//         "Content-Type": "application/x-www-form-urlencoded",
-//       },
-//     })
-//     .then((res) => {
-//       return res.data as ExchangeCodeResponse;
-//     })
-//     .catch(() => new Error("Exchange code failed"));
-// };
+if (!TRUE_LAYER_CLIENT_ID || !TRUE_LAYER_CLIENT_SECRET)
+  throw new Error(
+    "TRUE_LAYER_CLIENT_ID and TRUE_LAYER_CLIENT_SECRET must be set in environment"
+  );
 
-// export const refreshToken = async (
-//   refreshToken: string
-// ): Promise<RefreshTokenResponse | Error> => {
-//   const params = new URLSearchParams();
-//   params.set("grant_type", "refresh_token");
-//   params.set("client_id", process.env.TRUE_LAYER_CLIENT_ID);
-//   params.set("client_secret", process.env.TRUE_LAYER_CLIENT_SECRET);
-//   params.set("refresh_token", refreshToken);
+export const exchangeCode = async (
+  code: string
+): Promise<ExchangeCodeResponse | Error> => {
+  const params = new URLSearchParams();
+  params.set("grant_type", "authorization_code");
+  params.set("client_id", TRUE_LAYER_CLIENT_ID);
+  params.set("client_secret", TRUE_LAYER_CLIENT_SECRET);
+  params.set("redirect_uri", "http://localhost:3000/callback");
+  params.set("code", code);
 
-//   return axios
-//     .post(`https://${process.env.TRUE_LAYER_AUTH_API}/connect/token`, params, {
-//       headers: {
-//         "Content-Type": "application/x-www-form-urlencoded",
-//       },
-//     })
-//     .then((res) => {
-//       return res.data as RefreshTokenResponse;
-//     })
-//     .catch((err) => {
-//       return new Error("Refresh token flow failed");
-//     });
-// };
+  return axios
+    .post(`https://${process.env.TRUE_LAYER_AUTH_API}/connect/token`, params, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+    .then((res) => {
+      return res.data as ExchangeCodeResponse;
+    })
+    .catch(() => new Error("Exchange code failed"));
+};
 
-// /**
-//  * @param {string} id
-//  *
-//  * Gets a list of accounts for a bank from TrueLayer.
-//  **/
-// const getTruelayerAccounts = async (
-//   bankId: number
-// ): Promise<AccountResponse[] | Error> => {
-//   const bank = await db.models.bank
-//     .findByPk(bankId)
-//     .catch(() => new Error("Can't find bank account"));
-//   if (bank instanceof Error) {
-//     return bank;
-//   }
+export const refreshTokenTrueLayer = async (
+  refreshToken: string
+): Promise<RefreshTokenResponse | Error> => {
+  const params = new URLSearchParams();
+  params.set("grant_type", "refresh_token");
+  params.set("client_id", TRUE_LAYER_CLIENT_ID);
+  params.set("client_secret", TRUE_LAYER_CLIENT_SECRET);
+  params.set("refresh_token", refreshToken);
 
-//   return axios
-//     .get(`https://${process.env.TRUE_LAYER_API}/data/v1/accounts`, {
-//       headers: {
-//         Authorization: `Bearer ${bank.accessToken}`,
-//       },
-//     })
-//     .then((res) => res.data.results as AccountResponse[])
-//     .catch(() => new Error("Error fetching TrueLayer accounts"));
-// };
+  return axios
+    .post(`https://${process.env.TRUE_LAYER_AUTH_API}/connect/token`, params, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+    .then((res) => {
+      return res.data as RefreshTokenResponse;
+    })
+    .catch((err) => {
+      return new Error("Refresh token flow failed");
+    });
+};
+
+/**
+ * @param {string} id
+ *
+ * Gets a list of accounts for a bank from TrueLayer.
+ **/
+export const getTruelayerAccounts = async (
+  bankId: string
+): Promise<AccountResponse[] | Error> => {
+  const bank = await getBank(bankId);
+
+  if (bank === undefined) {
+    return new Error(`No Bank ${bankId} found`);
+  }
+
+  // If we're expired, kick off a refresh
+  await refreshBankIfNeeded(bankId);
+
+  return axios
+    .get(`https://${process.env.TRUE_LAYER_API}/data/v1/accounts`, {
+      headers: {
+        Authorization: `Bearer ${bank.trueLayer?.accessToken}`,
+      },
+    })
+    .then((res) => res.data.results as AccountResponse[])
+    .catch(() => new Error("Error fetching TrueLayer accounts"));
+};
 
 // /**
 //  * @param {number} bankId
