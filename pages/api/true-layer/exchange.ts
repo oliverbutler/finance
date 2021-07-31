@@ -4,9 +4,6 @@ import moment from "moment";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Bank } from "types/global";
 
-/**
- *
- */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse

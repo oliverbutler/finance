@@ -6,18 +6,11 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { id } = req.query;
-  let result;
 
   switch (req.method) {
     case "GET":
       const bank = await getBank(id as string);
       return res.json(bank);
-    case "DELETE":
-      result = await deleteBank(id as string);
-      return res.json(result);
-    case "PATCH":
-      result = await updateBank(id as string, req.body);
-      return res.json(result);
 
     default:
       return res.status(405).json({

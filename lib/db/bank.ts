@@ -4,7 +4,13 @@ import {
   refreshTokenTrueLayer,
 } from "lib/truelayer/data";
 import moment from "moment";
-import { DeleteResult, Document, ObjectId, UpdateResult } from "mongodb";
+import {
+  DeleteResult,
+  Document,
+  InsertOneResult,
+  ObjectId,
+  UpdateResult,
+} from "mongodb";
 import { Account, AccountResponse, Bank } from "types/global";
 import { connectMongo } from "./mongodb";
 
@@ -32,11 +38,14 @@ export const updateBank = async (id: string, args: Partial<Bank>) => {
     .updateOne({ _id: new ObjectId(id) }, { $set: args });
 };
 
-export const createBank = async (bank: Omit<Bank, "_id">) => {
+export const createBank = async (
+  bank: Omit<Bank, "_id">
+): Promise<InsertOneResult<Bank>> => {
   const { db } = await connectMongo();
   return db.collection("banks").insertOne(bank);
 };
 
+// TODO: Make this not override banks, make it update fields
 export const initializeBankAccounts = async (
   id: string
 ): Promise<Document | UpdateResult | Error> => {
@@ -76,9 +85,9 @@ export const mapTrueLayerAccount = (account: AccountResponse): Account => {
 export const refreshBankIfNeeded = async (id: string): Promise<boolean> => {
   const bank = await getBank(id);
 
-  if (bank === undefined) return false;
+  if (bank === undefined) throw new Error("Bank doesn't exist");
 
-  if (bank.trueLayer === null) return false;
+  if (bank.trueLayer === null) throw new Error("No TrueLayer auth on bank");
 
   if (moment(bank.trueLayer.expiresAt).isAfter(moment().add(1, "minute")))
     return false;
@@ -87,7 +96,7 @@ export const refreshBankIfNeeded = async (id: string): Promise<boolean> => {
     bank.trueLayer.refreshToken
   );
 
-  if (refreshResponse instanceof Error) return false;
+  if (refreshResponse instanceof Error) throw new Error("Error refreshing");
 
   await updateBank(id, {
     trueLayer: {

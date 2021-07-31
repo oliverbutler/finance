@@ -1,11 +1,14 @@
 import axios from "axios";
 import { getBank, refreshBankIfNeeded } from "lib/db/bank";
+import moment from "moment";
+import { Moment } from "moment";
 import {
   AccountResponse,
   Balance,
   ExchangeCodeResponse,
   RefreshTokenResponse,
   Transaction,
+  TransactionResponse,
 } from "types/global";
 
 const TRUE_LAYER_CLIENT_ID = process.env.TRUE_LAYER_CLIENT_ID;
@@ -23,7 +26,7 @@ export const exchangeCode = async (
   params.set("grant_type", "authorization_code");
   params.set("client_id", TRUE_LAYER_CLIENT_ID);
   params.set("client_secret", TRUE_LAYER_CLIENT_SECRET);
-  params.set("redirect_uri", "http://localhost:3000/callback");
+  params.set("redirect_uri", "http://localhost:4000/callback");
   params.set("code", code);
 
   return axios
@@ -88,13 +91,6 @@ export const getTruelayerAccounts = async (
     .catch(() => new Error("Error fetching TrueLayer accounts"));
 };
 
-export const getAllAccountTransactions = async (
-  bankId: string,
-  accountId: string
-): Promise<Transaction[]> => {
-  return [];
-};
-
 export const getAccountBalance = async (
   bankId: string,
   accountId: string
@@ -129,4 +125,80 @@ export const getAccountBalance = async (
     .catch((err) => {
       return new Error("TL request for balance failed");
     });
+};
+
+export const fetchTransactionsTimeSpan = async (
+  bankId: string,
+  accountId: string,
+  from: string,
+  to: string
+): Promise<Omit<Transaction, "_id">[] | Error> => {
+  const bank = await getBank(bankId);
+  if (bank === undefined) return new Error("Bank doesn't exist");
+
+  // If we're expired, kick off a refresh
+  await refreshBankIfNeeded(bankId);
+
+  return axios
+    .get(
+      `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions?from=${from}&to=${to}`,
+      {
+        headers: {
+          Authorization: `Bearer ${bank.trueLayer?.accessToken}`,
+        },
+      }
+    )
+    .then((res) => {
+      const trueLayerResults = res.data.results as TransactionResponse[];
+      return trueLayerResults.map((t) => mapTrueLayerTransaction(t, accountId));
+    })
+    .catch((err) => err);
+};
+
+export const fetchTwoYearsTransactions = async (
+  bankId: string,
+  accountId: string
+): Promise<Omit<Transaction, "_id">[] | Error> => {
+  return fetchTransactionsTimeSpan(
+    bankId,
+    accountId,
+    moment().subtract(1, "y").format("YYYY-MM-DD"),
+    moment().subtract(1, "d").format("YYYY-MM-DD")
+  );
+};
+
+export const fetchLatestTransactions = async (
+  bankId: string,
+  accountId: string
+): Promise<Omit<Transaction, "_id">[] | Error> => {
+  return fetchTransactionsTimeSpan(
+    bankId,
+    accountId,
+    moment().subtract(88, "days").format("YYYY-MM-DD"),
+    moment().format("YYYY-MM-DD")
+  );
+};
+
+export const mapTrueLayerTransaction = (
+  transaction: TransactionResponse,
+  accountId: string
+): Omit<Transaction, "_id"> => {
+  return {
+    transactionId: transaction.transaction_id,
+    accountId: accountId,
+    timestamp: new Date(transaction.timestamp),
+    importAt: new Date(),
+    description: transaction.description,
+    transactionType: transaction.transaction_type,
+    transactionCategory: transaction.transaction_category,
+    transactionClassification: transaction.transaction_classification,
+    merchantName: transaction.merchant_name,
+    amount: transaction.amount,
+    currency: transaction.currency,
+    meta: transaction.meta,
+    runningBalance: {
+      currency: transaction.running_balance.currency,
+      amount: transaction.running_balance.amount,
+    },
+  };
 };
