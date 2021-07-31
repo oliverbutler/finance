@@ -20,6 +20,7 @@ export const getTransactions = async (
     .find(filter)
     .skip(offset)
     .limit(limit)
+    .sort({ timestamp: -1 })
     .toArray();
 };
 
@@ -28,7 +29,7 @@ export const getTransactionsOfAccount = async (
   limit: number,
   offset: number
 ): Promise<Transaction[]> => {
-  return getTransactions({ accountId: accountId }, limit, offset);
+  return await getTransactions({ accountId: accountId }, limit, offset);
 };
 
 export const getTransaction = async (

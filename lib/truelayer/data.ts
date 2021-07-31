@@ -27,10 +27,10 @@ export const exchangeCode = async (
   params.set("grant_type", "authorization_code");
   params.set("client_id", TRUE_LAYER_CLIENT_ID);
   params.set("client_secret", TRUE_LAYER_CLIENT_SECRET);
-  params.set("redirect_uri", "http://localhost:4000/callback");
+  params.set("redirect_uri", "http://localhost:3000/callback");
   params.set("code", code);
 
-  return axios
+  return await axios
     .post(`https://${process.env.TRUE_LAYER_AUTH_API}/connect/token`, params, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -39,7 +39,7 @@ export const exchangeCode = async (
     .then((res) => {
       return res.data as ExchangeCodeResponse;
     })
-    .catch(() => new Error("Exchange code failed"));
+    .catch((err) => err);
 };
 
 export const refreshTokenTrueLayer = async (
@@ -153,6 +153,7 @@ export const fetchTransactionsTimeSpan = async (
     )
     .then((res) => {
       const trueLayerResults = res.data.results as TransactionResponse[];
+      console.log(trueLayerResults.map((r) => r.amount + " " + r.description));
       return trueLayerResults.map((t) => mapTrueLayerTransaction(t, accountId));
     })
     .catch((err) => err);
@@ -194,9 +195,11 @@ export const mapTrueLayerTransaction = (
     amount: transaction.amount,
     currency: transaction.currency,
     meta: transaction.meta,
-    runningBalance: {
-      currency: transaction.running_balance.currency,
-      amount: transaction.running_balance.amount,
-    },
+    runningBalance: transaction.running_balance
+      ? {
+          currency: transaction.running_balance.currency, // this is optional from the provider
+          amount: transaction.running_balance.amount,
+        }
+      : null,
   };
 };

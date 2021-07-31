@@ -45,19 +45,39 @@ export const createBank = async (
   return db.collection("banks").insertOne(bank);
 };
 
-// TODO: Make this not override banks, make it update fields
-export const initializeBankAccounts = async (
+export const upsertBankAccounts = async (
   id: string
 ): Promise<Document | UpdateResult | Error> => {
-  const accountResponse = await getTruelayerAccounts(id);
+  const { db } = await connectMongo();
 
+  // Get the accounts from truelayer
+  const accountResponse = await getTruelayerAccounts(id);
   if (accountResponse instanceof Error) return accountResponse;
 
+  // Map them to bank accounts
   const mappedAccounts = accountResponse.map(mapTrueLayerAccount);
 
-  const updatedResponse = await updateBank(id, { accounts: mappedAccounts });
+  // Get the bank
+  const bank = await getBank(id);
+  if (bank === undefined) return new Error("Bank not found");
 
-  return updatedResponse;
+  // Check which accounts are new
+  let newAccounts: Account[] = [];
+  mappedAccounts.forEach((account) => {
+    // If the account doesn't exist, add it to the new accounts list
+    if (!bank.accounts.find((a) => a.trueLayerId === account.trueLayerId))
+      newAccounts.push(account);
+  });
+
+  // Insert these new accounts into the db
+  const upsertResponse = db
+    .collection("banks")
+    .updateOne(
+      { _id: new ObjectId(id) },
+      { $addToSet: { accounts: { $each: newAccounts } } }
+    );
+
+  return upsertResponse;
 };
 
 export const mapTrueLayerAccount = (account: AccountResponse): Account => {
@@ -78,7 +98,6 @@ export const mapTrueLayerAccount = (account: AccountResponse): Account => {
       providerId: account.provider.provider_id,
     },
     trueLayerUpdatedAt: moment(account.update_timestamp).toDate(),
-    transactions: [],
   };
 };
 
@@ -114,8 +133,6 @@ export const refreshBankIfNeeded = async (id: string): Promise<boolean> => {
 export const updateBankBalances = async (
   bankId: string
 ): Promise<string | Error> => {
-  console.log("Balance is stale - refreshing");
-
   const { db } = await connectMongo();
 
   const bank = await getBank(bankId);
@@ -147,7 +164,10 @@ export const checkBankBalanceAndUpdate = (bank: Bank): void => {
   let markedForRefresh = false;
 
   bankAccounts.forEach((account) => {
-    if (moment(account.balance?.updatedAt).isBefore(moment().subtract(30, "m")))
+    if (account.balance === undefined) markedForRefresh = true;
+    else if (
+      moment(account.balance?.updatedAt).isBefore(moment().subtract(30, "m"))
+    )
       markedForRefresh = true;
   });
 

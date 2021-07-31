@@ -1,8 +1,5 @@
 import { batchUpsertTransactions } from "lib/db/transaction";
-import {
-  fetchLatestTransactions,
-  fetchTwoYearsTransactions,
-} from "lib/truelayer/data";
+import { fetchLatestTransactions } from "lib/truelayer/data";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -22,7 +19,12 @@ export default async function handler(
         req.body.accountId
       );
 
-      if (result instanceof Error) return res.status(405).send(result);
+      if (result instanceof Error)
+        return res.status(400).json({
+          message: result.message,
+          name: result.name,
+          stack: result.stack,
+        });
 
       const batchResult = await batchUpsertTransactions(result);
 

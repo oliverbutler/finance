@@ -42,7 +42,7 @@ export interface Transaction {
   runningBalance: {
     currency: string;
     amount: number;
-  };
+  } | null;
 }
 
 export interface Account {
@@ -64,7 +64,6 @@ export interface Account {
   trueLayerUpdatedAt: Date;
 
   balance?: Balance;
-  transactions: Transaction[];
 }
 
 export interface ExchangeCodeResponse {
