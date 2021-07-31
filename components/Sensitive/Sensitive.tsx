@@ -2,7 +2,11 @@ import classNames from "classnames";
 import { useSensitive } from "components/ContextWrapper/ContextWrapper";
 import React from "react";
 
-interface Props {}
+interface Props
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLSpanElement>,
+    HTMLSpanElement
+  > {}
 export const Sensitive: React.FunctionComponent<Props> = ({ children }) => {
   const { sensitive } = useSensitive();
 
