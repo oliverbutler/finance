@@ -1,8 +1,5 @@
-import axios from "axios";
-import classNames from "classnames";
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { useQuery } from "react-query";
 import { Transaction } from "types/global";
 
 interface Props {
