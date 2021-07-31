@@ -114,6 +114,8 @@ export const refreshBankIfNeeded = async (id: string): Promise<boolean> => {
 export const updateBankBalances = async (
   bankId: string
 ): Promise<string | Error> => {
+  console.log("Balance is stale - refreshing");
+
   const { db } = await connectMongo();
 
   const bank = await getBank(bankId);
@@ -137,4 +139,17 @@ export const updateBankBalances = async (
   });
 
   return "Success";
+};
+
+export const checkBankBalanceAndUpdate = (bank: Bank): void => {
+  const bankAccounts = bank.accounts;
+
+  let markedForRefresh = false;
+
+  bankAccounts.forEach((account) => {
+    if (moment(account.balance?.updatedAt).isBefore(moment().subtract(30, "m")))
+      markedForRefresh = true;
+  });
+
+  if (markedForRefresh) updateBankBalances(bank._id);
 };

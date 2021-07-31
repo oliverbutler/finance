@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getBank, refreshBankIfNeeded } from "lib/db/bank";
+import { connectMongo } from "lib/db/mongodb";
 import moment from "moment";
 import { Moment } from "moment";
 import {
@@ -130,8 +131,8 @@ export const getAccountBalance = async (
 export const fetchTransactionsTimeSpan = async (
   bankId: string,
   accountId: string,
-  from: string,
-  to: string
+  from?: string,
+  to?: string
 ): Promise<Omit<Transaction, "_id">[] | Error> => {
   const bank = await getBank(bankId);
   if (bank === undefined) return new Error("Bank doesn't exist");
@@ -141,7 +142,9 @@ export const fetchTransactionsTimeSpan = async (
 
   return axios
     .get(
-      `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions?from=${from}&to=${to}`,
+      from && to
+        ? `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions?from=${from}&to=${to}`
+        : `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions`,
       {
         headers: {
           Authorization: `Bearer ${bank.trueLayer?.accessToken}`,
@@ -171,12 +174,7 @@ export const fetchLatestTransactions = async (
   bankId: string,
   accountId: string
 ): Promise<Omit<Transaction, "_id">[] | Error> => {
-  return fetchTransactionsTimeSpan(
-    bankId,
-    accountId,
-    moment().subtract(88, "days").format("YYYY-MM-DD"),
-    moment().format("YYYY-MM-DD")
-  );
+  return fetchTransactionsTimeSpan(bankId, accountId);
 };
 
 export const mapTrueLayerTransaction = (

@@ -1,6 +1,5 @@
 import { Sensitive } from "components/Sensitive/Sensitive";
 import moment from "moment";
-import Image from "next/image";
 import React from "react";
 import { Account } from "types/global";
 
