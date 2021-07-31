@@ -15,10 +15,12 @@ export const Accounts: React.FunctionComponent<Props> = ({ accounts }) => {
           className="flex mb-6 w-2/6 bg-indigo-500 mr-6 text-white rounded-xl p-4 cursor-pointer"
         >
           <div className="mr-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={account.provider.logoUri}
               height={50}
               width={50}
+              alt="Account Logo"
               style={{ filter: "brightness(0) invert(1)" }}
             ></img>
           </div>

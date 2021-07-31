@@ -31,7 +31,7 @@ export default function Home() {
 
       {isLoading && <Loading />}
       {accounts && <Accounts accounts={accounts} />}
-      <Transactions />
+      <Transactions accounts={accounts} />
       <ConnectBankButton />
     </Page>
   );
