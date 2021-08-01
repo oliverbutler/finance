@@ -8,9 +8,10 @@ import { Accounts } from "components/Account/Accounts";
 import { Sensitive } from "components/Sensitive/Sensitive";
 import { Transactions } from "components/Transactions/Transactions";
 import { ConnectBankButton } from "components/ConnectBank/ConnectBankButton";
+import { TransactionGraph } from "components/Transactions/TransactionGraph";
 
 export default function Home() {
-  const { isLoading, error, data } = useQuery<Bank[]>("banks", () =>
+  const { isLoading, data } = useQuery<Bank[]>("banks", () =>
     fetch("http://localhost:4000/api/banks").then((res) => res.json())
   );
 
@@ -31,6 +32,7 @@ export default function Home() {
 
       {isLoading && <Loading />}
       {accounts && <Accounts accounts={accounts} />}
+      <TransactionGraph />
       <Transactions accounts={accounts} />
       <ConnectBankButton />
     </Page>

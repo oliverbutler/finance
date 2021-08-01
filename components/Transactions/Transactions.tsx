@@ -40,7 +40,7 @@ export const Transactions: React.FunctionComponent<TransactionProps> = ({
     "transactions",
     () =>
       axios
-        .get(`http://localhost:4000/api/transactions?limit=20&offset=0`)
+        .get(`http://localhost:4000/api/transactions?limit=100&offset=0`)
         .then((res) => res.data)
   );
 
