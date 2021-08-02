@@ -36,9 +36,10 @@ export const getTransactionsGroupAccount = async (
     .find(filter)
     .skip(offset)
     .limit(limit)
-    
+
     .sort({ timestamp: -1 })
     .toArray();
+};
 
 export const getTransactionsOfAccount = async (
   accountId: string,

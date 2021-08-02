@@ -37,10 +37,10 @@ const Navigation = () => {
           />
           <Button
             className="-m-2"
-            variant={session ? Button_Type.Secondary : Button_Type.Primary}
-            onClick={session ? () => signOut() : () => signIn()}
+            variant={Button_Type.Primary}
+            link={{ href: "/account" }}
           >
-            Sign {session ? "out" : "in"}
+            {session ? "Account" : "Sign In"}
           </Button>
         </div>
       </nav>

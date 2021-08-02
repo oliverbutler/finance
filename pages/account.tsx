@@ -1,6 +1,6 @@
 import React from "react";
 import Page from "../components/Page/Page";
-import { useSession, signIn, signOut } from "next-auth/client";
+import { useSession, signIn } from "next-auth/client";
 import { Title } from "components/Typography/Typography";
 import { Button } from "components/Button/Button";
 import { Loading } from "components/Loading/Loading";

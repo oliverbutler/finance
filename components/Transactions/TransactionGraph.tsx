@@ -1,9 +1,8 @@
 import React from "react";
-import { Account, Transaction } from "types/global";
+import { Account, Bank, Transaction } from "types/global";
 import {
   AnimatedAxis,
   AnimatedGrid,
-  AnimatedLineSeries,
   AnimatedAreaSeries,
   XYChart,
   Tooltip,
@@ -13,7 +12,8 @@ import { useQuery } from "react-query";
 import axios from "axios";
 
 const mapTransactionsToSeries = (
-  transactions: Transaction[]
+  transactions: Transaction[],
+  banks: Bank[]
 ): Record<string, { x: string; y: number }[]> => {
   const runningTotalMap: Record<string, Transaction[]> = {};
 
@@ -30,12 +30,22 @@ const mapTransactionsToSeries = (
   Object.keys(runningTotalMap).map((accountId) => {
     const arr = runningTotalMap[accountId];
 
+    let balance = 0;
+    banks.forEach((bank) => {
+      const account = bank.accounts.find((a) => a.trueLayerId === accountId);
+      if (account !== undefined && account.balance)
+        balance = account.balance.current;
+    });
+
     const output: { x: string; y: number }[] = arr
       .map((t) => {
-        return {
+        const figure = {
           x: moment(t.timestamp).format("L"),
-          y: t.runningBalance?.amount ?? 0,
+          y: balance,
         };
+
+        balance -= t.amount;
+        return figure;
       })
       .reverse();
 
@@ -51,15 +61,21 @@ const accessors = {
 };
 
 export const TransactionGraph: React.FunctionComponent = () => {
+  const { isLoading: isBanksLoading, data: banksData } = useQuery<Bank[]>(
+    "banks",
+    () => fetch("http://localhost:4000/api/banks").then((res) => res.json())
+  );
+
   const { data, isLoading, error } = useQuery<Transaction[]>(
     "transactions",
     () =>
       axios
-        .get(`http://localhost:4000/api/transactions?limit=100&offset=0`)
+        .get(`http://localhost:4000/api/transactions?limit=20&offset=0`)
         .then((res) => res.data)
   );
 
-  const seriesData = data ? mapTransactionsToSeries(data) : {};
+  const seriesData =
+    data && banksData ? mapTransactionsToSeries(data, banksData) : {};
 
   return (
     <XYChart height={300} xScale={{ type: "band" }} yScale={{ type: "linear" }}>
