@@ -894,7 +894,7 @@ axe-core@^4.0.2:
   resolved "https://registry.npmjs.org/axe-core/-/axe-core-4.3.1.tgz"
   integrity sha512-3WVgVPs/7OnKU3s+lqMtkv3wQlg3WxK1YifmpJSDO0E1aPBrZWlrrTO6cxRqCXLuX2aYgCljqXIQd0VnRidV0g==
 
-axios@^0.21.1:
+axios@0.21.1, axios@^0.21.1:
   version "0.21.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
   integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
@@ -3548,6 +3548,13 @@ pkg-up@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
+plaid@^9.0.0-beta.14:
+  version "9.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/plaid/-/plaid-9.0.0-beta.14.tgz#ab270980830fcc066824afaf9692cabbda65d9e9"
+  integrity sha512-h4wQowl9271MezLGxlp0XRJUWJ1620/ioISnP9YoT4RJmoRsagCkdUXyoU5Qt9rxe7mNMJlsxShBsrQ365XMnQ==
+  dependencies:
+    axios "0.21.1"
+
 platform@1.3.6:
   version "1.3.6"
   resolved "https://registry.npmjs.org/platform/-/platform-1.3.6.tgz"
@@ -4082,6 +4089,14 @@ react-layout-effect@^1.0.1:
   resolved "https://registry.yarnpkg.com/react-layout-effect/-/react-layout-effect-1.0.5.tgz#0dc4e24452aee5de66c93c166f0ec512dfb1be80"
   integrity sha512-zdRXHuch+OBHU6bvjTelOGUCM+UDr/iCY+c0wXLEAc+G4/FlcJruD/hUOzlKH5XgO90Y/BUJPNhI/g9kl+VAsA==
 
+react-plaid-link@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-plaid-link/-/react-plaid-link-3.2.0.tgz#79a2a8fa3c56071bf84cbe47c78ff98cb630912e"
+  integrity sha512-PA63HrtuvRo6zGFtGJBmywjB8olWY3GBio1Aa+12y6eCnccIIJrEuY5yIWuXkG2l4BHM6cspIm3DCptDBpsQDw==
+  dependencies:
+    prop-types "^15.7.2"
+    react-script-hook "1.3.0"
+
 react-query@^3.19.0:
   version "3.19.1"
   resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.19.1.tgz#f3fbd5af48b6c47901ab230f7c028c6f845254ac"
@@ -4095,6 +4110,11 @@ react-refresh@0.8.3:
   version "0.8.3"
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.8.3.tgz"
   integrity sha512-X8jZHc7nCMjaCqoU+V2I0cOhNW+QMBwSUkeXnTi8IPe6zaRWfn60ZzvFDZqWPfmSJfjub7dDW1SP0jaHWLu/hg==
+
+react-script-hook@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/react-script-hook/-/react-script-hook-1.3.0.tgz#edf2746ea46114fa4c38fdcf796a0ba82e6d53f8"
+  integrity sha512-VlAyqXywHJHpbJgWoWFWSavXumGAyfW2RD4Jd8DyV/G1n5ufngiaUlCHVvmglvJnysfAYzovcjjkEhSVzcVpuQ==
 
 react-spring@^9.0.0-rc.3:
   version "9.0.0-rc.3"
