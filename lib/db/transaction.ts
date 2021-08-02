@@ -24,23 +24,6 @@ export const getTransactions = async (
     .toArray();
 };
 
-export const getTransactionsGroupAccount = async (
-  filter: Filter<Document>,
-  limit: number,
-  offset: number
-): Promise<Transaction[]> => {
-  const { db } = await connectMongo();
-
-  return db
-    .collection("transactions")
-    .find(filter)
-    .skip(offset)
-    .limit(limit)
-
-    .sort({ timestamp: -1 })
-    .toArray();
-};
-
 export const getTransactionsOfAccount = async (
   accountId: string,
   limit: number,

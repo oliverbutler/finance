@@ -132,7 +132,8 @@ export const fetchTransactionsTimeSpan = async (
   bankId: string,
   accountId: string,
   from?: string,
-  to?: string
+  to?: string,
+  pending?: boolean
 ): Promise<Omit<Transaction, "_id">[] | Error> => {
   const bank = await getBank(bankId);
   if (bank === undefined) return new Error("Bank doesn't exist");
@@ -142,7 +143,9 @@ export const fetchTransactionsTimeSpan = async (
 
   return axios
     .get(
-      from && to
+      pending
+        ? `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions/pending`
+        : from && to
         ? `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions?from=${from}&to=${to}`
         : `https://${process.env.TRUE_LAYER_API}/data/v1/accounts/${accountId}/transactions`,
       {
@@ -153,7 +156,6 @@ export const fetchTransactionsTimeSpan = async (
     )
     .then((res) => {
       const trueLayerResults = res.data.results as TransactionResponse[];
-      console.log(trueLayerResults.map((r) => r.amount + " " + r.description));
       return trueLayerResults.map((t) => mapTrueLayerTransaction(t, accountId));
     })
     .catch((err) => err);
@@ -176,6 +178,19 @@ export const fetchLatestTransactions = async (
   accountId: string
 ): Promise<Omit<Transaction, "_id">[] | Error> => {
   return fetchTransactionsTimeSpan(bankId, accountId);
+};
+
+export const fetchPendingTransactions = async (
+  bankId: string,
+  accountId: string
+): Promise<Omit<Transaction, "_id">[] | Error> => {
+  return fetchTransactionsTimeSpan(
+    bankId,
+    accountId,
+    undefined,
+    undefined,
+    true
+  );
 };
 
 export const mapTrueLayerTransaction = (

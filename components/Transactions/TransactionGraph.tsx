@@ -10,49 +10,31 @@ import {
 import moment from "moment";
 import { useQuery } from "react-query";
 import axios from "axios";
+import { Sensitive } from "components/Sensitive/Sensitive";
 
 const mapTransactionsToSeries = (
   transactions: Transaction[],
   banks: Bank[]
-): Record<string, { x: string; y: number }[]> => {
-  const runningTotalMap: Record<string, Transaction[]> = {};
-
-  transactions.forEach((t) => {
-    if (runningTotalMap[t.accountId]) {
-      runningTotalMap[t.accountId].push(t);
-    } else {
-      runningTotalMap[t.accountId] = [t];
-    }
-  });
-
-  const seriesMap: Record<string, { x: string; y: number }[]> = {};
-
-  Object.keys(runningTotalMap).map((accountId) => {
-    const arr = runningTotalMap[accountId];
-
-    let balance = 0;
-    banks.forEach((bank) => {
-      const account = bank.accounts.find((a) => a.trueLayerId === accountId);
+): { x: string; y: number }[] => {
+  let balance = 0;
+  banks.forEach((bank) => {
+    bank.accounts.forEach((account) => {
       if (account !== undefined && account.balance)
-        balance = account.balance.current;
+        balance += account.balance?.current;
     });
-
-    const output: { x: string; y: number }[] = arr
-      .map((t) => {
-        const figure = {
-          x: moment(t.timestamp).format("L"),
-          y: balance,
-        };
-
-        balance -= t.amount;
-        return figure;
-      })
-      .reverse();
-
-    seriesMap[accountId] = output;
   });
 
-  return seriesMap;
+  const output: { x: string; y: number }[] = transactions
+    .map((t) => {
+      const figure = {
+        x: moment(t.timestamp).format("L"),
+        y: balance,
+      };
+      balance -= t.amount;
+      return figure;
+    })
+    .reverse();
+  return output;
 };
 
 const accessors = {
@@ -75,25 +57,27 @@ export const TransactionGraph: React.FunctionComponent = () => {
   );
 
   const seriesData =
-    data && banksData ? mapTransactionsToSeries(data, banksData) : {};
+    data && banksData ? mapTransactionsToSeries(data, banksData) : null;
 
   return (
-    <XYChart height={300} xScale={{ type: "band" }} yScale={{ type: "linear" }}>
+    <XYChart height={250} xScale={{ type: "band" }} yScale={{ type: "linear" }}>
       <AnimatedAxis orientation="bottom" />
-      <AnimatedAxis orientation="right" />
+      <Sensitive>
+        <AnimatedAxis orientation="right" />
+      </Sensitive>
       <AnimatedGrid columns={false} numTicks={5} />
-      {Object.keys(seriesData).map((accountId) => (
+      {seriesData && (
         <AnimatedAreaSeries
-          key={accountId}
-          dataKey={accountId}
-          data={seriesData[accountId]}
+          key={"Accounts"}
+          dataKey={"Accounts"}
+          data={seriesData}
           fill="rgba(99, 102, 241, 0.15)"
           lineProps={{
             stroke: "rgb(99, 102, 241)",
           }}
           {...accessors}
         />
-      ))}
+      )}
       <Tooltip
         snapTooltipToDatumX
         snapTooltipToDatumY

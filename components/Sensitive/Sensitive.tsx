@@ -10,6 +10,10 @@ interface Props
 export const Sensitive: React.FunctionComponent<Props> = ({ children }) => {
   const { sensitive } = useSensitive();
 
+  if (!sensitive) {
+    return <>{children}</>;
+  }
+
   return (
     <span className={classNames({ "filter blur-lg": sensitive })}>
       {children}
